@@ -41,29 +41,29 @@
 
         .result-section .result {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             padding: 10px;
             font-size: 20px;
         }
 
         .result-section .result div {
-            width: 60px;
-            height: 60px;
+            width: 100px;
+            height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 50%;
             font-weight: bold;
+            font-size: 24px;
+            color: white;
         }
 
         .big {
             background-color: #28a745;
-            color: white;
         }
 
         .small {
             background-color: #007bff;
-            color: white;
         }
 
         .timer {
@@ -73,6 +73,11 @@
         }
     </style>
     <script>
+        function sumDigits(period) {
+            // Sum the digits of the period number
+            return period.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+        }
+
         function updateTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -82,22 +87,18 @@
             const minutes = now.getMinutes() + 1; // Adding 1 to minutes
 
             const totalMinutes = String(hours * 60 + minutes).padStart(2, '0');
+            const realPeriod = `${year}${month}${day}01${totalMinutes}`;
+            document.getElementById('current-time').textContent = realPeriod;
 
-            const displayTime = `${year}${month}${day}01${totalMinutes}`;
-            document.getElementById('current-time').textContent = displayTime;
+            // Sum digits of the period number
+            const digitSum = sumDigits(realPeriod);
 
-            // Calculate random number for period result
-            const periodResult = [];
-            for (let i = 0; i < 5; i++) {
-                const number = Math.floor(Math.random() * 10);
-                const isEven = number % 2 === 0;
+            // Determine the result based on whether the sum of digits is odd or even
+            const result = digitSum % 2 === 0 ? 'BIG' : 'SMALL';
 
-                // Randomly assign BIG or SMALL for even numbers
-                const result = isEven ? (Math.random() < 0.5 ? 'BIG' : 'SMALL') : 'BIG';
-                periodResult.push(`<div class="${result === 'BIG' ? 'big' : 'small'}">${number} (${result})</div>`);
-            }
-
-            document.getElementById('period-result').innerHTML = periodResult.join('');
+            // Display result in colored circle
+            const resultDisplay = `<div class="${result === 'BIG' ? 'big' : 'small'}">${result}</div>`;
+            document.getElementById('period-result').innerHTML = resultDisplay;
 
             // Update remaining time till next minute
             const secondsLeft = 60 - now.getSeconds();
@@ -117,14 +118,14 @@
 
         <!-- Period Number Section -->
         <div class="period-number">
-            Period Number: <span id="period-number">2024092801069</span>
+            Real Period Number: <span id="period-number">2024092801069</span>
         </div>
 
         <!-- Result Section -->
         <div class="result-section">
-            <h3>Results:</h3>
+            <h3>Result:</h3>
             <div class="result" id="period-result">
-                <!-- Period results (Numbers and Big/Small) will be displayed here -->
+                <!-- Period result (BIG/SMALL) will be displayed here -->
             </div>
         </div>
 
