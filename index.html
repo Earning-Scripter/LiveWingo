@@ -3,161 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColourGame Result</title>
+    <title>91 Club</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #2d2d2d;
-            color: #fff;
-            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 400px;
             margin: 20px auto;
-            background-color: #3e3e3e;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        h1 {
-            color: #00ff99;
-            font-size: 32px;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-
-        .period-number, .result, .remaining-time, .history {
+        .balance p {
             font-size: 24px;
-            margin: 20px 0;
-            padding: 10px 0;
-            border-bottom: 1px solid #444;
-        }
-
-        .period-number span, .result span, .remaining-time span, .history span {
-            font-weight: bold;
-            color: #00ff99;
-        }
-
-        .result {
-            font-size: 28px;
-            color: #00b0ff;
-        }
-
-        .remaining-time {
-            font-size: 22px;
-            color: #ff5722;
-        }
-
-        .fixed-result {
-            color: #ffd700;
-            font-size: 28px;
-        }
-
-        .history {
-            color: #fff;
-            font-size: 16px;
-        }
-
-        .history div {
             margin: 10px 0;
         }
 
-        .history small {
-            color: #ccc;
-            font-size: 14px;
+        .action-buttons {
+            margin: 20px 0;
+        }
+
+        .action-buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .withdraw {
+            background-color: #ff4d4d;
+        }
+
+        .deposit {
+            background-color: #4CAF50;
+        }
+
+        .options .colors button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #ddd;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .options .numbers button {
+            margin: 5px;
+            padding: 10px;
+            background-color: #eee;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .options .random {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            text-align: left;
+            margin: 10px 0 5px;
+        }
+
+        form input {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #ff4d4d;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
-    <script>
-        const periodResults = {}; // Store fixed results
-
-        // Function to generate the next result (Fixed Result)
-        function generateFixedResult(periodNumber) {
-            if (periodResults[periodNumber]) {
-                return periodResults[periodNumber]; // Return the fixed result
-            }
-
-            const randomNumber = Math.floor(Math.random() * 10);
-            const resultText = randomNumber <= 4 ? 'small' : 'big'; // Using small letters
-            const colorIndicator = randomNumber % 2 === 0 ? '🔴' : '🟢';
-
-            const result = `${randomNumber} - ${resultText} (${colorIndicator})`;
-
-            periodResults[periodNumber] = result; // Store result
-
-            // Add result to history
-            addToHistory(periodNumber, result);
-
-            return result;
-        }
-
-        // Function to add to history
-        function addToHistory(periodNumber, result) {
-            const historyDiv = document.getElementById('history');
-            const newHistoryEntry = document.createElement('div');
-            newHistoryEntry.innerHTML = `<small>${periodNumber}</small> <span>${result}</span>`;
-            historyDiv.prepend(newHistoryEntry); // Add new history entry to the top
-        }
-
-        // Function to generate the period number
-        function generatePeriodNumber() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-            const period = `${year}${month}${day}01${String(hours * 60 + minutes).padStart(2, '0')}`;
-            return period;
-        }
-
-        // Function to update the period and result every minute
-        function updatePeriodAndResult() {
-            const periodNumber = generatePeriodNumber();
-            const result = generateFixedResult(periodNumber);
-
-            document.getElementById('periodNumber').textContent = `Period: ${periodNumber}`;
-            document.getElementById('result').textContent = `Result: ${result}`;
-
-            updateRemainingTime();
-
-            const now = new Date();
-            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
-            setTimeout(updatePeriodAndResult, millisecondsUntilNextMinute);
-        }
-
-        // Function to show remaining time until next result
-        function updateRemainingTime() {
-            const now = new Date();
-            const remainingSeconds = 60 - now.getSeconds();
-            document.getElementById('remainingTime').textContent = `Next result in: ${remainingSeconds} seconds`;
-
-            if (remainingSeconds > 0) {
-                setTimeout(updateRemainingTime, 1000);
-            }
-        }
-
-        // Initialize page
-        window.onload = function () {
-            updatePeriodAndResult();
-        };
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>ColourGame Result</h1>
-
-        <div class="period-number" id="periodNumber">Period: Loading...</div>
-        <div class="result" id="result">Result: Loading...</div>
-        <div class="remaining-time" id="remainingTime">Next result in: Loading...</div>
-
-        <div class="history" id="history">
-            <h2>History</h2>
-            <!-- History results will appear here -->
+    <!-- Home Page -->
+    <div id="homePage" class="container hidden">
+        <div class="balance">
+            <p>₹<span id="walletBalance">0</span></p>
+            <p>Wallet balance</p>
+        </div>
+        <div class="action-buttons">
+            <button class="withdraw" onclick="withdraw()">Withdraw</button>
+            <button class="deposit">Deposit</button>
+        </div>
+        <div class="timer">
+            <p>Win Go 1 Min</p>
+            <p>Time remaining: <span>00:22</span></p>
+        </div>
+        <!-- The number and options area -->
+        <div class="options">
+            <div class="colors">
+                <button>Green</button>
+                <button>Violet</button>
+                <button>Red</button>
+            </div>
+            <div class="numbers">
+                <button>0</button>
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+                <button>7</button>
+                <button>8</button>
+                <button>9</button>
+            </div>
+            <button class="random">Random x1</button>
         </div>
     </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="container">
+        <h2>Log in</h2>
+        <form onsubmit="return login()">
+            <label for="login-phone">Phone number</label>
+            <input type="tel" id="login-phone" placeholder="+91">
+            
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Password">
+            
+            <button type="submit">Log in</button>
+        </form>
+        <a href="#" onclick="showRegister()">Register</a>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="container hidden">
+        <h2>Register</h2>
+        <form onsubmit="return register()">
+            <label for="register-phone">Phone number</label>
+            <input type="tel" id="register-phone" placeholder="+91">
+            
+            <label for="register-password">Set password</label>
+            <input type="password" id="register-password" placeholder="Password">
+            
+            <label for="confirm-password">Confirm password</label>
+            <input type="password" id="confirm-password" placeholder="Confirm password">
+            
+            <label for="invite-code">Invite code</label>
+            <input type="text" id="invite-code" placeholder="Invite code">
+
+            <button type="submit">Register</button>
+        </form>
+        <a href="#" onclick="showLogin()">Log in</a>
+    </div>
+
+    <script>
+        // Show the register page
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+        }
+
+        // Show the login page
+        function showLogin() {
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        // Show the home page
+        function showHomePage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('homePage').classList.remove('hidden');
+            updateWalletBalance();
+        }
+
+        // Register user
+        function register() {
+            const phone = document.getElementById('register-phone').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return false;
+            }
+
+            // Store user data and give a sign-up bonus of ₹100
+            localStorage.setItem('phone', phone);
+            localStorage.setItem('password', password);
+            localStorage.setItem('walletBalance', 100); // Sign up bonus
+
+            alert('Registration successful! Bonus ₹100 added.');
+            showLogin();
+            return false;
+        }
+
+        // Log in user
+        function login() {
+            const phone = document.getElementById('login-phone').value;
+            const password = document.getElementById('login-password').value;
+
+            const storedPhone = localStorage.getItem('phone');
+            const storedPassword = localStorage.getItem('password');
+
+            if (phone === storedPhone && password === storedPassword) {
+                showHomePage();
+            } else {
+                alert('Invalid login credentials');
+            }
+            return false;
+        }
+
+        // Update wallet balance
+        function updateWalletBalance() {
+            const balance = localStorage.getItem('walletBalance');
+            document.getElementById('walletBalance').textContent = balance;
+        }
+
+        // Withdraw function
+        function withdraw() {
+            let balance = parseInt(localStorage.getItem('walletBalance'), 10);
+            if (balance >= 50) {
+                balance -= 50;
+                localStorage.setItem('walletBalance', balance);
+                updateWalletBalance();
+                alert('You have withdrawn ₹50');
+            } else {
+                alert('Insufficient balance');
+            }
+        }
+
+        // On page load, check if the user is already logged in
+        window.onload = function() {
+            if (localStorage.getItem('phone')) {
+                showHomePage();
+            }
+        };
+    </script>
 </body>
 </html>
