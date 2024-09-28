@@ -3,172 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Updated ColourGame</title>
+    <title>ColourGame Result</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
+            background-color: #2d2d2d;
+            color: #fff;
+            text-align: center;
             margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 600px;
             margin: 20px auto;
+            background-color: #3e3e3e;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            font-size: 22px;
-            color: #333;
-            text-align: center;
+            color: #00ff99;
+            font-size: 32px;
             margin-bottom: 20px;
+            letter-spacing: 2px;
         }
 
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+        .period-number, .result, .remaining-time, .history {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
         }
 
-        .period {
+        .period-number span, .result span, .remaining-time span, .history span {
+            font-weight: bold;
+            color: #00ff99;
+        }
+
+        .result {
+            font-size: 28px;
+            color: #00b0ff;
+        }
+
+        .remaining-time {
+            font-size: 22px;
+            color: #ff5722;
+        }
+
+        .fixed-result {
+            color: #ffd700;
+            font-size: 28px;
+        }
+
+        .history {
+            color: #fff;
             font-size: 16px;
-            font-weight: bold;
-            color: #333;
         }
 
-        .number {
-            font-size: 30px;
-            font-weight: bold;
-            color: #f00;
-            display: flex;
-            align-items: center;
+        .history div {
+            margin: 10px 0;
         }
 
-        .small-big {
-            font-size: 18px;
-            color: #333;
-        }
-
-        .color-dots {
-            display: flex;
-            gap: 10px;
-        }
-
-        .dot {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-        }
-
-        .red {
-            background-color: red;
-        }
-
-        .purple {
-            background-color: purple;
-        }
-
-        .history-section {
-            margin-top: 20px;
-        }
-
-        .history-section h2 {
-            font-size: 18px;
-            margin-bottom: 10px;
+        .history small {
+            color: #ccc;
+            font-size: 14px;
         }
     </style>
     <script>
-        const periodResults = JSON.parse(localStorage.getItem('periodResults')) || {};
+        const periodResults = {}; // Store fixed results
 
+        // Function to generate the next result (Fixed Result)
         function generateFixedResult(periodNumber) {
             if (periodResults[periodNumber]) {
-                return periodResults[periodNumber];
+                return periodResults[periodNumber]; // Return the fixed result
             }
 
-            const randomNumber = Math.floor(Math.random() * 10); 
-            const bigSmall = randomNumber <= 4 ? 'Small' : 'Big';
-            const colorDot1 = randomNumber % 2 === 0 ? 'red' : 'purple';
-            const colorDot2 = randomNumber % 2 !== 0 ? 'red' : 'purple'; 
+            const randomNumber = Math.floor(Math.random() * 10);
+            const resultText = randomNumber <= 4 ? 'small' : 'big'; // Using small letters
+            const colorIndicator = randomNumber % 2 === 0 ? '🔴' : '🟢';
 
-            const result = { number: randomNumber, bigSmall, colorDot1, colorDot2 };
+            const result = `${randomNumber} - ${resultText} (${colorIndicator})`;
 
-            periodResults[periodNumber] = result;
-            localStorage.setItem('periodResults', JSON.stringify(periodResults));
+            periodResults[periodNumber] = result; // Store result
+
+            // Add result to history
+            addToHistory(periodNumber, result);
 
             return result;
         }
 
-        function generatePeriodNumber() {
-            const now = new Date();
-            return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+        // Function to add to history
+        function addToHistory(periodNumber, result) {
+            const historyDiv = document.getElementById('history');
+            const newHistoryEntry = document.createElement('div');
+            newHistoryEntry.innerHTML = `<small>${periodNumber}</small> <span>${result}</span>`;
+            historyDiv.prepend(newHistoryEntry); // Add new history entry to the top
         }
 
-        function updateResult() {
+        // Function to generate the period number
+        function generatePeriodNumber() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const period = `${year}${month}${day}01${String(hours * 60 + minutes).padStart(2, '0')}`;
+            return period;
+        }
+
+        // Function to update the period and result every minute
+        function updatePeriodAndResult() {
             const periodNumber = generatePeriodNumber();
             const result = generateFixedResult(periodNumber);
 
-            document.getElementById('period').textContent = periodNumber;
-            document.getElementById('number').textContent = result.number;
-            document.getElementById('bigSmall').textContent = result.bigSmall;
-            
-            const colorDots = document.querySelectorAll('.color-dots .dot');
-            colorDots[0].className = 'dot ' + result.colorDot1;
-            colorDots[1].className = 'dot ' + result.colorDot2;
+            document.getElementById('periodNumber').textContent = `Period: ${periodNumber}`;
+            document.getElementById('result').textContent = `Result: ${result}`;
 
-            updateHistory();
+            updateRemainingTime();
+
+            const now = new Date();
+            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
+            setTimeout(updatePeriodAndResult, millisecondsUntilNextMinute);
         }
 
-        function updateHistory() {
-            const historySection = document.getElementById('history');
-            historySection.innerHTML = '';
+        // Function to show remaining time until next result
+        function updateRemainingTime() {
+            const now = new Date();
+            const remainingSeconds = 60 - now.getSeconds();
+            document.getElementById('remainingTime').textContent = `Next result in: ${remainingSeconds} seconds`;
 
-            Object.keys(periodResults).slice(-5).reverse().forEach(period => {
-                const result = periodResults[period];
-                historySection.innerHTML += `
-                    <div class="result-row">
-                        <div class="period">${period}</div>
-                        <div class="number">${result.number}</div>
-                        <div class="small-big">${result.bigSmall}</div>
-                        <div class="color-dots">
-                            <div class="dot ${result.colorDot1}"></div>
-                            <div class="dot ${result.colorDot2}"></div>
-                        </div>
-                    </div>
-                `;
-            });
+            if (remainingSeconds > 0) {
+                setTimeout(updateRemainingTime, 1000);
+            }
         }
 
+        // Initialize page
         window.onload = function () {
-            updateResult();
+            updatePeriodAndResult();
         };
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Updated ColourGame Results</h1>
+        <h1>ColourGame Result</h1>
 
-        <!-- Current Period Result -->
-        <div class="result-row">
-            <div class="period" id="period">Loading...</div>
-            <div class="number" id="number">Loading...</div>
-            <div class="small-big" id="bigSmall">Loading...</div>
-            <div class="color-dots">
-                <div class="dot red"></div>
-                <div class="dot purple"></div>
-            </div>
-        </div>
+        <div class="period-number" id="periodNumber">Period: Loading...</div>
+        <div class="result" id="result">Result: Loading...</div>
+        <div class="remaining-time" id="remainingTime">Next result in: Loading...</div>
 
-        <!-- History Section -->
-        <div class="history-section">
+        <div class="history" id="history">
             <h2>History</h2>
-            <div id="history">
-                <!-- Previous results will be inserted here -->
-            </div>
+            <!-- History results will appear here -->
         </div>
     </div>
 </body>
