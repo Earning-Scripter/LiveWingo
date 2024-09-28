@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed ColourGame</title>
+    <title>Updated ColourGame</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -28,41 +28,38 @@
             margin-bottom: 20px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        th, td {
-            text-align: center;
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
-        th {
-            background-color: #007bff;
-            color: white;
+        .period {
             font-size: 16px;
-        }
-
-        td {
-            font-size: 14px;
-        }
-
-        .result {
-            font-size: 24px;
             font-weight: bold;
-            color: #007bff;
+            color: #333;
         }
 
-        .small {
-            font-size: 14px;
-            font-weight: normal;
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #f00;
+            display: flex;
+            align-items: center;
         }
 
-        .color-circle {
-            display: inline-block;
+        .small-big {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .color-dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
             width: 15px;
             height: 15px;
             border-radius: 50%;
@@ -72,8 +69,8 @@
             background-color: red;
         }
 
-        .green {
-            background-color: green;
+        .purple {
+            background-color: purple;
         }
 
         .history-section {
@@ -95,9 +92,10 @@
 
             const randomNumber = Math.floor(Math.random() * 10); 
             const bigSmall = randomNumber <= 4 ? 'Small' : 'Big';
-            const color = randomNumber % 2 === 0 ? '🔴' : '🟢'; 
+            const colorDot1 = randomNumber % 2 === 0 ? 'red' : 'purple';
+            const colorDot2 = randomNumber % 2 !== 0 ? 'red' : 'purple'; 
 
-            const result = { number: randomNumber, bigSmall, color };
+            const result = { number: randomNumber, bigSmall, colorDot1, colorDot2 };
 
             periodResults[periodNumber] = result;
             localStorage.setItem('periodResults', JSON.stringify(periodResults));
@@ -117,24 +115,30 @@
             document.getElementById('period').textContent = periodNumber;
             document.getElementById('number').textContent = result.number;
             document.getElementById('bigSmall').textContent = result.bigSmall;
-            document.getElementById('color').textContent = result.color;
+            
+            const colorDots = document.querySelectorAll('.color-dots .dot');
+            colorDots[0].className = 'dot ' + result.colorDot1;
+            colorDots[1].className = 'dot ' + result.colorDot2;
 
             updateHistory();
         }
 
         function updateHistory() {
-            const historyTable = document.getElementById('history');
-            historyTable.innerHTML = '';
+            const historySection = document.getElementById('history');
+            historySection.innerHTML = '';
 
             Object.keys(periodResults).slice(-5).reverse().forEach(period => {
                 const result = periodResults[period];
-                historyTable.innerHTML += `
-                    <tr>
-                        <td>${period}</td>
-                        <td>${result.number}</td>
-                        <td>${result.bigSmall}</td>
-                        <td>${result.color}</td>
-                    </tr>
+                historySection.innerHTML += `
+                    <div class="result-row">
+                        <div class="period">${period}</div>
+                        <div class="number">${result.number}</div>
+                        <div class="small-big">${result.bigSmall}</div>
+                        <div class="color-dots">
+                            <div class="dot ${result.colorDot1}"></div>
+                            <div class="dot ${result.colorDot2}"></div>
+                        </div>
+                    </div>
                 `;
             });
         }
@@ -146,41 +150,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>ColourGame Results</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Period</th>
-                    <th>Number</th>
-                    <th>Big Small</th>
-                    <th>Color</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="period">Loading...</td>
-                    <td id="number" class="result">Loading...</td>
-                    <td id="bigSmall" class="result">Loading...</td>
-                    <td id="color" class="result">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
+        <h1>Updated ColourGame Results</h1>
 
+        <!-- Current Period Result -->
+        <div class="result-row">
+            <div class="period" id="period">Loading...</div>
+            <div class="number" id="number">Loading...</div>
+            <div class="small-big" id="bigSmall">Loading...</div>
+            <div class="color-dots">
+                <div class="dot red"></div>
+                <div class="dot purple"></div>
+            </div>
+        </div>
+
+        <!-- History Section -->
         <div class="history-section">
             <h2>History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Number</th>
-                        <th>Big Small</th>
-                        <th>Color</th>
-                    </tr>
-                </thead>
-                <tbody id="history">
-                    <!-- History results will be inserted here -->
-                </tbody>
-            </table>
+            <div id="history">
+                <!-- Previous results will be inserted here -->
+            </div>
         </div>
     </div>
 </body>
