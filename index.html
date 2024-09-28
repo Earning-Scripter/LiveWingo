@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f53d3d 0%, #ff6347 100%);
+            background: linear-gradient(135deg, #F16F6F, #FF5050);
             margin: 0;
             padding: 0;
             color: #fff;
@@ -18,42 +18,41 @@
         }
 
         .container {
-            width: 350px;
+            width: 360px;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            text-align: center;
         }
 
         h3 {
-            text-align: center;
-            color: #fefefe;
-            font-size: 26px;
-            margin-bottom: 15px;
+            font-size: 28px;
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
         #current-time {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
-            color: #f5f5f5;
-            text-align: center;
+            color: #fefefe;
             margin-bottom: 20px;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
         }
 
         .result-section {
-            text-align: center;
             margin-bottom: 30px;
         }
 
         .result-section .result {
-            font-size: 35px;
-            font-weight: 700;
+            font-size: 36px;
+            font-weight: bold;
             color: #fff;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: inline-block;
             transition: background-color 0.5s ease;
         }
 
@@ -78,53 +77,54 @@
         }
 
         .history ul li {
-            margin: 5px 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
+            margin: 8px 0;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
             font-size: 16px;
-            color: #f5f5f5;
+            color: #fff;
             transition: background-color 0.3s ease;
         }
 
         .history ul li:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         .timer {
-            text-align: center;
-            font-size: 20px;
+            font-size: 22px;
             color: #ffeb3b;
             font-weight: bold;
             margin-top: 20px;
+            letter-spacing: 1px;
         }
 
-        button.clear-history {
+        button.refresh {
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 12px 25px;
+            font-size: 18px;
             font-weight: bold;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             background-color: #ff6347;
             color: white;
-            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        button.clear-history:hover {
+        button.refresh:hover {
             background-color: #f53d3d;
+            transform: scale(1.05);
         }
 
         /* Responsive Design */
         @media (max-width: 400px) {
             .container {
-                width: 90%;
+                width: 95%;
             }
 
             #current-time {
-                font-size: 24px;
+                font-size: 26px;
             }
 
             .result-section .result {
@@ -133,6 +133,10 @@
 
             .history ul li {
                 font-size: 14px;
+            }
+
+            .timer {
+                font-size: 20px;
             }
         }
     </style>
@@ -145,7 +149,7 @@
             return period.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
         }
 
-        function updateTime() {
+        function updateTime(refresh = false) {
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -167,18 +171,22 @@
             const resultDisplay = `<div class="result ${result === 'BIG' ? 'big' : 'small'}">${result}</div>`;
             document.getElementById('period-result').innerHTML = resultDisplay;
 
-            // Add result to history and localStorage
-            history.unshift(`${periodNumber} - ${result}`);
-            if (history.length > 5) history.pop(); // Limit history to 5 entries
-            localStorage.setItem('history', JSON.stringify(history));
-            updateHistory();
+            // Check if the period is already in the history
+            if (!history.includes(`${periodNumber} - ${result}`)) {
+                history.unshift(`${periodNumber} - ${result}`);
+                if (history.length > 5) history.pop(); // Limit history to 5 entries
+                localStorage.setItem('history', JSON.stringify(history));
+                updateHistory();
+            }
 
-            // Update remaining time till next minute
-            const secondsLeft = 60 - now.getSeconds();
-            document.getElementById('timer').textContent = `Remaining time: ${secondsLeft}s`;
+            if (!refresh) {
+                // Update remaining time till next minute
+                const secondsLeft = 60 - now.getSeconds();
+                document.getElementById('timer').textContent = `Remaining time: ${secondsLeft}s`;
 
-            // Set timeout to update at the start of the next minute
-            setTimeout(updateTime, secondsLeft * 1000);
+                // Set timeout to update at the start of the next minute
+                setTimeout(updateTime, 1000);
+            }
         }
 
         function updateHistory() {
@@ -186,10 +194,9 @@
             historyList.innerHTML = history.map(entry => `<li>${entry}</li>`).join('');
         }
 
-        function clearHistory() {
-            history = [];
-            localStorage.setItem('history', JSON.stringify(history));
-            updateHistory();
+        function refreshPeriod() {
+            // Force refresh the current time and result
+            updateTime(true);
         }
 
         window.onload = function() {
@@ -219,9 +226,9 @@
             </ul>
         </div>
 
-        <!-- Clear History Button -->
-        <div style="text-align: center;">
-            <button class="clear-history" onclick="clearHistory()">Clear History</button>
+        <!-- Refresh Button -->
+        <div>
+            <button class="refresh" onclick="refreshPeriod()">Refresh</button>
         </div>
 
         <!-- Timer (Remaining Time) -->
