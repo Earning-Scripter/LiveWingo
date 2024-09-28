@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor - Hacker Style</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #00ff00;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        h1 {
+            color: #00ff00;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .period-number {
+            font-size: 22px;
+            margin: 15px 0;
+        }
+
+        .result {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .history {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .history-item {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .history-item span {
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
+    <script>
+        let lastResult = null;
+
+        // Function to generate the next random result
+        function predictNextResult() {
+            const randomNumber = Math.floor(Math.random() * 10); // Random number between 0 and 9
+            let resultText = randomNumber <= 4 ? 'SMALL' : 'BIG'; // If 0-4, SMALL; if 5-9, BIG
+            let colorIndicator = randomNumber % 2 === 0 ? '🔴' : '🟢'; // If even, Red; if odd, Green
+
+            // Update the result and display
+            const nextResult = `${randomNumber} - ${resultText} ${colorIndicator}`;
+            document.getElementById('result').textContent = `Result: ${nextResult}`;
+
+            // Save result to history and localStorage
+            lastResult = nextResult;
+            saveToHistory(nextResult);
+
+            // Return the next result for further predictions
+            return nextResult;
+        }
+
+        // Function to generate the period number
+        function updatePeriod() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = now.getHours();
+            const minutes = now.getMinutes() + 1; // Adding 1 to minutes
+
+            const totalMinutes = String(hours * 60 + minutes).padStart(2, '0');
+            const displayTime = `${year}${month}${day}01${totalMinutes}`;
+
+            document.getElementById('periodNumber').textContent = `Period: ${displayTime}`;
+
+            // Update every minute
+            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
+            setTimeout(updatePeriod, millisecondsUntilNextMinute);
+        }
+
+        // Save result to history and localStorage
+        function saveToHistory(result) {
+            let history = JSON.parse(localStorage.getItem('resultHistory')) || [];
+            history.push(result);
+
+            // Store only the last 10 results
+            if (history.length > 10) history.shift();
+
+            localStorage.setItem('resultHistory', JSON.stringify(history));
+            displayHistory(history);
+        }
+
+        // Display the history on the page
+        function displayHistory(history) {
+            const historyElement = document.getElementById('history');
+            historyElement.innerHTML = '';
+
+            history.forEach((item, index) => {
+                historyElement.innerHTML += `<div class="history-item">#${index + 1} - ${item}</div>`;
+            });
+        }
+
+        // Load history from localStorage on page load
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('resultHistory')) || [];
+            displayHistory(history);
+        }
+
+        // Initialize page
+        window.onload = function () {
+            updatePeriod();
+            loadHistory();
+            setInterval(predictNextResult, 60000); // Predict a new result every minute
+        };
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Hacker Themed Predictor</h1>
+
+        <div class="period-number" id="periodNumber">Period: Loading...</div>
+
+        <div class="result" id="result">Result: Loading...</div>
+
+        <div class="history" id="history">
+            <h3>History</h3>
+            <!-- History items will be added here dynamically -->
+        </div>
+    </div>
+
+</body>
+</html>
