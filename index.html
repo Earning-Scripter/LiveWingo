@@ -3,143 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColourGame Result</title>
+    <title>Fixed ColourGame</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #2d2d2d;
-            color: #fff;
-            text-align: center;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 20px auto;
-            background-color: #3e3e3e;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            color: #00ff99;
-            font-size: 32px;
+            font-size: 22px;
+            color: #333;
+            text-align: center;
             margin-bottom: 20px;
-            letter-spacing: 2px;
         }
 
-        .period-number, .result, .remaining-time {
-            font-size: 24px;
-            margin: 20px 0;
-            padding: 10px 0;
-            border-bottom: 1px solid #444;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
-        .period-number span, .result span, .remaining-time span {
-            font-weight: bold;
-            color: #00ff99;
+        th, td {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+        }
+
+        td {
+            font-size: 14px;
         }
 
         .result {
-            font-size: 28px;
-            color: #00b0ff;
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
         }
 
-        .remaining-time {
-            font-size: 22px;
-            color: #ff5722;
+        .small {
+            font-size: 14px;
+            font-weight: normal;
         }
 
-        .fixed-result {
-            color: #ffd700;
-            font-size: 28px;
+        .color-circle {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-section h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
     </style>
     <script>
-        // Object to store fixed results for each period
-        const periodResults = {};
+        const periodResults = JSON.parse(localStorage.getItem('periodResults')) || {};
 
-        // Function to generate the next result for each period (Fixed Result)
         function generateFixedResult(periodNumber) {
-            // If a result already exists for this period, return the fixed result
             if (periodResults[periodNumber]) {
                 return periodResults[periodNumber];
             }
 
-            const randomNumber = Math.floor(Math.random() * 10); // Random number between 0 and 9
-            const resultText = randomNumber <= 4 ? 'SMALL' : 'BIG'; // SMALL if 0-4, BIG if 5-9
-            const colorIndicator = randomNumber % 2 === 0 ? '🔴' : '🟢'; // Even numbers 🔴, Odd numbers 🟢
+            const randomNumber = Math.floor(Math.random() * 10); 
+            const bigSmall = randomNumber <= 4 ? 'Small' : 'Big';
+            const color = randomNumber % 2 === 0 ? '🔴' : '🟢'; 
 
-            const result = `${randomNumber} - ${resultText} (${colorIndicator})`;
+            const result = { number: randomNumber, bigSmall, color };
 
-            // Store the result for the period
             periodResults[periodNumber] = result;
+            localStorage.setItem('periodResults', JSON.stringify(periodResults));
 
             return result;
         }
 
-        // Function to generate the period number
         function generatePeriodNumber() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-
-            // Combine to create a period number (YYYYMMDD + hours*60 + minutes)
-            const period = `${year}${month}${day}01${String(hours * 60 + minutes).padStart(2, '0')}`;
-
-            return period;
+            return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
         }
 
-        // Function to update the period and result every minute
-        function updatePeriodAndResult() {
+        function updateResult() {
             const periodNumber = generatePeriodNumber();
             const result = generateFixedResult(periodNumber);
 
-            document.getElementById('periodNumber').textContent = `Period: ${periodNumber}`;
-            document.getElementById('result').textContent = `Result: ${result}`;
+            document.getElementById('period').textContent = periodNumber;
+            document.getElementById('number').textContent = result.number;
+            document.getElementById('bigSmall').textContent = result.bigSmall;
+            document.getElementById('color').textContent = result.color;
 
-            // Update the remaining time every second
-            updateRemainingTime();
-
-            // Update every minute
-            const now = new Date();
-            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
-            setTimeout(updatePeriodAndResult, millisecondsUntilNextMinute);
+            updateHistory();
         }
 
-        // Function to show the remaining time until the next minute
-        function updateRemainingTime() {
-            const now = new Date();
-            const remainingSeconds = 60 - now.getSeconds();
-            document.getElementById('remainingTime').textContent = `Next result in: ${remainingSeconds} seconds`;
+        function updateHistory() {
+            const historyTable = document.getElementById('history');
+            historyTable.innerHTML = '';
 
-            if (remainingSeconds > 0) {
-                setTimeout(updateRemainingTime, 1000);
-            }
+            Object.keys(periodResults).slice(-5).reverse().forEach(period => {
+                const result = periodResults[period];
+                historyTable.innerHTML += `
+                    <tr>
+                        <td>${period}</td>
+                        <td>${result.number}</td>
+                        <td>${result.bigSmall}</td>
+                        <td>${result.color}</td>
+                    </tr>
+                `;
+            });
         }
 
-        // Initialize the page when loaded
         window.onload = function () {
-            updatePeriodAndResult(); // Start period and result update
+            updateResult();
         };
     </script>
 </head>
 <body>
-
     <div class="container">
-        <h1>ColourGame Result</h1>
+        <h1>ColourGame Results</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Number</th>
+                    <th>Big Small</th>
+                    <th>Color</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="period">Loading...</td>
+                    <td id="number" class="result">Loading...</td>
+                    <td id="bigSmall" class="result">Loading...</td>
+                    <td id="color" class="result">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="period-number" id="periodNumber">Period: Loading...</div>
-
-        <div class="result" id="result">Result: Loading...</div>
-
-        <div class="remaining-time" id="remainingTime">Next result in: Loading...</div>
+        <div class="history-section">
+            <h2>History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Number</th>
+                        <th>Big Small</th>
+                        <th>Color</th>
+                    </tr>
+                </thead>
+                <tbody id="history">
+                    <!-- History results will be inserted here -->
+                </tbody>
+            </table>
+        </div>
     </div>
-
 </body>
 </html>
