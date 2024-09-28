@@ -22,40 +22,29 @@
         }
 
         #current-time {
-            font-size: 24px;
-            font-family: monospace;
+            font-size: 28px;
+            font-family: 'Arial', sans-serif;
             text-align: center;
             margin-bottom: 20px;
-        }
-
-        .period-number {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
         }
 
         .result-section {
             text-align: center;
             margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .result-section .result {
-            display: flex;
-            justify-content: center;
-            padding: 10px;
-            font-size: 20px;
-        }
-
-        .result-section .result div {
-            width: 100px;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
+            font-size: 30px;
             font-weight: bold;
-            font-size: 24px;
-            color: white;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 10px;
         }
 
         .big {
@@ -66,13 +55,38 @@
             background-color: #007bff;
         }
 
+        .history {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .history ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .history ul li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #eaeaea;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #444;
+        }
+
         .timer {
             text-align: center;
             font-size: 18px;
             color: red;
+            margin-top: 20px;
         }
     </style>
     <script>
+        // Track the history of results
+        let history = [];
+
         function sumDigits(period) {
             // Sum the digits of the period number
             return period.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
@@ -87,18 +101,23 @@
             const minutes = now.getMinutes() + 1; // Adding 1 to minutes
 
             const totalMinutes = String(hours * 60 + minutes).padStart(2, '0');
-            const realPeriod = `${year}${month}${day}01${totalMinutes}`;
-            document.getElementById('current-time').textContent = realPeriod;
+            const periodNumber = `${year}${month}${day}01${totalMinutes}`;
+            document.getElementById('current-time').textContent = periodNumber;
 
             // Sum digits of the period number
-            const digitSum = sumDigits(realPeriod);
+            const digitSum = sumDigits(periodNumber);
 
             // Determine the result based on whether the sum of digits is odd or even
             const result = digitSum % 2 === 0 ? 'BIG' : 'SMALL';
 
-            // Display result in colored circle
+            // Display result professionally
             const resultDisplay = `<div class="${result === 'BIG' ? 'big' : 'small'}">${result}</div>`;
             document.getElementById('period-result').innerHTML = resultDisplay;
+
+            // Add result to history
+            history.unshift(`${periodNumber} - ${result}`);
+            if (history.length > 5) history.pop(); // Limit history to 5 entries
+            updateHistory();
 
             // Update remaining time till next minute
             const secondsLeft = 60 - now.getSeconds();
@@ -106,6 +125,11 @@
 
             // Set timeout to update at the start of the next minute
             setTimeout(updateTime, secondsLeft * 1000);
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = history.map(entry => `<li>${entry}</li>`).join('');
         }
 
         window.onload = updateTime;
@@ -116,17 +140,20 @@
         <!-- Current Time (Period Number) -->
         <div id="current-time"></div>
 
-        <!-- Period Number Section -->
-        <div class="period-number">
-            Real Period Number: <span id="period-number">2024092801069</span>
-        </div>
-
         <!-- Result Section -->
         <div class="result-section">
             <h3>Result:</h3>
             <div class="result" id="period-result">
                 <!-- Period result (BIG/SMALL) will be displayed here -->
             </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="history">
+            <h4>History:</h4>
+            <ul id="history-list">
+                <!-- History of past periods and results will be displayed here -->
+            </ul>
         </div>
 
         <!-- Timer (Remaining Time) -->
