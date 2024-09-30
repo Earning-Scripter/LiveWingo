@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -68,6 +69,7 @@
             0% {
                 opacity: 0;
             }
+
             100% {
                 opacity: 1;
             }
@@ -91,7 +93,7 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
 
-            // Correct period format: YYYYMMDDHHMM
+            // Update the period number format as YYYYMMDDHHMM
             const displayTime = `${year}${month}${day}${hours}${minutes}`;
             document.getElementById('period-number').textContent = displayTime;
 
@@ -132,6 +134,7 @@
         };
     </script>
 </head>
+
 <body>
     <div class="result-container">
         <!-- Header Section -->
@@ -152,10 +155,9 @@
 
         <!-- Remaining Time Display -->
         <div class="result-row">
-            <div style="flex: 1; text-align: right; font-size: 14px; color: #f7931e;">
-                Remaining time: <span id="remaining-time">60s</span>
-            </div>
+            <div style="flex: 1; text-align: right; font-size: 14px; color: #f7931e;">Remaining time: <span id="remaining-time">60s</span></div>
         </div>
     </div>
 </body>
+
 </html>
