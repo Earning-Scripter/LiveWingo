@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result Display</title>
+    <title>Countdown Timer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,109 +14,90 @@
             height: 100vh;
             background-color: #f9f9f9;
             margin: 0;
+            background: linear-gradient(45deg, #ffa726, #fb8c00);
         }
 
-        .result-container {
-            border: 2px solid #f7931e;
+        .timer-container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .remaining-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            font-weight: bold;
+        }
+
+        .countdown div {
+            background-color: #ffffff;
             border-radius: 10px;
             padding: 20px;
-            background-color: white;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 300px;
+            margin: 0 5px;
+            min-width: 50px;
         }
 
         .header {
-            background-color: #f7931e;
-            color: white;
-            padding: 10px 0;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .header div {
-            display: inline-block;
-            width: 33%;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .period, .number, .bigsmall, .color {
-            margin: 10px 0;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .color span {
             font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
         }
 
-        .green {
-            color: green;
-        }
-
-        .red {
-            color: red;
-        }
-
-        @keyframes fade {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        .fade-in {
-            animation: fade 1s ease-in-out;
+        .header-text {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
         }
     </style>
 
     <script>
-        function generateRandomNumber() {
-            return Math.floor(Math.random() * 10);
+        function startCountdown(duration) {
+            var timer = duration, minutes, seconds;
+            setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                document.getElementById('minutes').textContent = minutes;
+                document.getElementById('seconds').textContent = seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
         }
 
-        function updateTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = now.getHours();
-            const minutes = now.getMinutes() + 1;
-
-            const totalMinutes = String(hours * 60 + minutes).padStart(4, '0');
-
-            const displayTime = `${year}${month}${day}01${totalMinutes}`;
-            document.getElementById('period-number').textContent = displayTime;
-
-            const randomNumber = generateRandomNumber();
-            document.getElementById('random-number').textContent = randomNumber;
-
-            const bigSmall = randomNumber >= 5 ? 'BIG' : 'SMALL';
-            document.getElementById('big-small').textContent = bigSmall;
-
-            const color = randomNumber % 2 === 0 ? '🔴' : '🟢';
-            const colorClass = randomNumber % 2 === 0 ? 'red' : 'green';
-            document.getElementById('color').textContent = color;
-            document.getElementById('color').className = colorClass + " fade-in";
-
-            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
-            setTimeout(updateTime, millisecondsUntilNextMinute);
-        }
-
-        window.onload = updateTime;
+        window.onload = function () {
+            var countdownDuration = 30; // Countdown time in seconds
+            startCountdown(countdownDuration);
+        };
     </script>
 </head>
 
 <body>
-    <div class="result-container">
-        <div class="header">
-            <div>Period</div>
-            <div>Number</div>
-            <div>Big Small</div>
-            <div>Color</div>
+    <div class="timer-container">
+        <div class="remaining-text">Time remaining</div>
+        <div class="countdown">
+            <div id="minutes">00</div>
+            <div>:</div>
+            <div id="seconds">30</div>
         </div>
-        <div class="period" id="period-number"></div>
-        <div class="number" id="random-number"></div>
-        <div class="bigsmall" id="big-small"></div>
-        <div class="color" id="color"></div>
     </div>
 </body>
 
