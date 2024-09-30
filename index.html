@@ -80,17 +80,15 @@
             return Math.floor(Math.random() * 10);
         }
 
-        function updateTime() {
+        function updatePeriodAndResult() {
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const hours = now.getHours();
-            const minutes = now.getMinutes() + 1;
+            const minutes = now.getMinutes();
 
-            const totalMinutes = String(hours * 60 + minutes).padStart(4, '0');
-
-            const displayTime = `${year}${month}${day}01${totalMinutes}`;
+            const displayTime = `${year}${month}${day}${hours}${String(minutes).padStart(2, '0')}`;
             document.getElementById('period-number').textContent = displayTime;
 
             const randomNumber = generateRandomNumber();
@@ -103,32 +101,32 @@
             const colorClass = randomNumber % 2 === 0 ? 'red' : 'green';
             document.getElementById('color').textContent = color;
             document.getElementById('color').className = colorClass + " fade-in";
-
-            // Call this function again every minute to refresh the period time and results
-            const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
-            setTimeout(updateTime, millisecondsUntilNextMinute);
         }
 
-        function startCountdown(duration) {
-            let timer = duration, seconds;
+        function startCountdown() {
             const countdownElem = document.getElementById('remaining-time');
+            
+            // Update the countdown based on the remaining seconds in the current minute
+            function updateCountdown() {
+                const now = new Date();
+                const secondsLeft = 60 - now.getSeconds();  // Time left for the next minute
 
-            const interval = setInterval(() => {
-                seconds = Math.floor(timer % 60);
-                seconds = seconds < 10 ? '0' + seconds : seconds;
+                countdownElem.textContent = secondsLeft + 's';  // Display seconds
 
-                countdownElem.textContent = seconds + 's'; // Display seconds
-
-                if (--timer < 0) {
-                    clearInterval(interval);
-                    startCountdown(60);  // Reset timer to 60 seconds
+                if (secondsLeft === 60) {
+                    updatePeriodAndResult();  // Update period and result when the next minute starts
                 }
-            }, 1000);
+
+                // Call this function every 1 second
+                setTimeout(updateCountdown, 1000);
+            }
+
+            updateCountdown();  // Start the countdown immediately
         }
 
         window.onload = function () {
-            updateTime();
-            startCountdown(60);  // Set countdown for 60 seconds
+            updatePeriodAndResult();  // Initialize with the first period and result
+            startCountdown();  // Start the countdown timer
         };
     </script>
 </head>
