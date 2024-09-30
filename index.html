@@ -85,10 +85,10 @@
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes() + 1).padStart(2, '0'); // Add 1 to minute
 
-            const displayTime = `${year}${month}${day}${hours}${String(minutes).padStart(2, '0')}`;
+            const displayTime = `${year}${month}${day}${hours}${minutes}`;
             document.getElementById('period-number').textContent = displayTime;
 
             const randomNumber = generateRandomNumber();
@@ -105,28 +105,26 @@
 
         function startCountdown() {
             const countdownElem = document.getElementById('remaining-time');
-            
-            // Update the countdown based on the remaining seconds in the current minute
+
             function updateCountdown() {
                 const now = new Date();
-                const secondsLeft = 60 - now.getSeconds();  // Time left for the next minute
+                const secondsLeft = 60 - now.getSeconds();
 
-                countdownElem.textContent = secondsLeft + 's';  // Display seconds
+                countdownElem.textContent = secondsLeft + 's';
 
                 if (secondsLeft === 60) {
-                    updatePeriodAndResult();  // Update period and result when the next minute starts
+                    updatePeriodAndResult();
                 }
 
-                // Call this function every 1 second
                 setTimeout(updateCountdown, 1000);
             }
 
-            updateCountdown();  // Start the countdown immediately
+            updateCountdown();
         }
 
         window.onload = function () {
-            updatePeriodAndResult();  // Initialize with the first period and result
-            startCountdown();  // Start the countdown timer
+            updatePeriodAndResult();
+            startCountdown();
         };
     </script>
 </head>
