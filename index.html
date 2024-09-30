@@ -66,8 +66,13 @@
         }
 
         @keyframes fade {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
 
         .fade-in {
@@ -86,9 +91,9 @@
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes() + 1).padStart(2, '0'); // Add 1 to minute
+            const minutes = String(now.getMinutes()).padStart(2, '0'); // Minutes without adjustment
 
-            const displayTime = `${year}${month}${day}${hours}${minutes}`;
+            const displayTime = `${year}${month}${day}${hours}${minutes}`; // Correct period format
             document.getElementById('period-number').textContent = displayTime;
 
             const randomNumber = generateRandomNumber();
@@ -113,7 +118,7 @@
                 countdownElem.textContent = secondsLeft + 's';
 
                 if (secondsLeft === 60) {
-                    updatePeriodAndResult();
+                    updatePeriodAndResult(); // Update when next minute starts
                 }
 
                 setTimeout(updateCountdown, 1000);
