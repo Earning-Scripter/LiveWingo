@@ -14,45 +14,47 @@
             height: 100vh;
             margin: 0;
             background-color: #f9f9f9;
-            flex-direction: row; /* Landscape friendly */
         }
 
         .result-container {
             border: 2px solid #f7931e;
             border-radius: 10px;
-            padding: 20px;
+            padding: 10px;
             background-color: white;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            max-width: 700px;
+            width: 100%;
         }
 
         .header {
             background-color: #f7931e;
             color: white;
-            padding: 10px 0;
+            padding: 8px 0;
             border-radius: 10px 10px 0 0;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+            font-size: 18px;
         }
 
         .header div {
-            width: 24%;
-            font-size: 18px;
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
             font-weight: bold;
         }
 
-        .period, .number, .bigsmall, .color {
+        .result-row {
+            display: flex;
+            justify-content: space-between;
             margin: 10px 0;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
         }
 
-        .color span {
-            font-size: 24px;
+        .result-item {
+            flex: 1;
+            text-align: center;
         }
 
         .green {
@@ -61,13 +63,6 @@
 
         .red {
             color: red;
-        }
-
-        .timer {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #f7931e;
         }
 
         @keyframes fade {
@@ -109,27 +104,24 @@
             document.getElementById('color').textContent = color;
             document.getElementById('color').className = colorClass + " fade-in";
 
+            // Call this function again every minute to refresh the period time and results
             const millisecondsUntilNextMinute = (60 - now.getSeconds()) * 1000;
             setTimeout(updateTime, millisecondsUntilNextMinute);
         }
 
         function startCountdown(duration) {
-            let timer = duration, minutes, seconds;
-            const countdownElem = document.getElementById('timer');
+            let timer = duration, seconds;
+            const countdownElem = document.getElementById('remaining-time');
 
             const interval = setInterval(() => {
-                minutes = Math.floor(timer / 60);
                 seconds = Math.floor(timer % 60);
-
-                minutes = minutes < 10 ? '0' + minutes : minutes;
                 seconds = seconds < 10 ? '0' + seconds : seconds;
 
-                countdownElem.textContent = minutes + ':' + seconds;
+                countdownElem.textContent = seconds + 's'; // Display seconds
 
                 if (--timer < 0) {
                     clearInterval(interval);
-                    // Reset the countdown to start again
-                    startCountdown(duration);
+                    startCountdown(60);  // Reset timer to 60 seconds
                 }
             }, 1000);
         }
@@ -143,10 +135,7 @@
 
 <body>
     <div class="result-container">
-        <!-- Timer Section -->
-        <div class="timer" id="timer">01:00</div>
-
-        <!-- Result Display Section -->
+        <!-- Header Section -->
         <div class="header">
             <div>Period</div>
             <div>Number</div>
@@ -154,10 +143,18 @@
             <div>Color</div>
         </div>
 
-        <div class="period" id="period-number"></div>
-        <div class="number" id="random-number"></div>
-        <div class="bigsmall" id="big-small"></div>
-        <div class="color" id="color"></div>
+        <!-- Result Section -->
+        <div class="result-row">
+            <div class="result-item" id="period-number"></div>
+            <div class="result-item green" id="random-number">3</div>
+            <div class="result-item" id="big-small">Small</div>
+            <div class="result-item green" id="color">🟢</div>
+        </div>
+
+        <!-- Remaining Time Display -->
+        <div class="result-row">
+            <div style="flex: 1; text-align: right; font-size: 14px; color: #f7931e;">Remaining time: <span id="remaining-time">60s</span></div>
+        </div>
     </div>
 </body>
 
